@@ -1,4 +1,70 @@
-🚀 GameVerse Hub - Ultimate Gaming Platform
+# 🚀 GameVerse Hub - Ultimate Gaming Platform
+
+<div align="center">
+
+🎮 **Your Ultimate Gaming Universe Awaits!**
+
+GameVerse Hub is a full-stack gaming platform that combines a powerful **Spring Boot backend** with interactive **HTML5 browser games** and external game integrations.
+
+✨ Play offline classics • 🌐 Explore online games • 🏆 Track scores • ⭐ Leave reviews • 👨‍💻 Showcase your own games
+
+**14+ Games • JWT Auth • MySQL/H2 • Responsive UI**
+
+</div>
+
+---
+
+## ✨ Key Features
+
+| Feature | Description | Status |
+|--------|-------------|--------|
+| 🎯 Offline Games | Snake, Tic-Tac-Toe, Memory Match, RPS, Quiz, Breakout & more | ✅ Live |
+| 🌐 Online Games | Integration with Poki, CrazyGames | ✅ Live |
+| 🔐 Authentication | Secure JWT Login/Register | ✅ Live |
+| 🏆 Leaderboards | Track high scores | 🔄 Planned |
+| ⭐ Reviews | Rate & review games | 🔄 Planned |
+| ❤️ Favorites | Save games | 🔄 Planned |
+| 👨‍💻 Developer Hub | Upload your own games | 🔄 Planned |
+| 📱 Responsive UI | Works on all devices | ✅ Live |
+
+---
+
+## 🛠 Tech Stack
+
+### 🔹 Backend
+- Spring Boot 3.2.0  
+- Java 21  
+- Spring Security  
+- JWT Authentication  
+- JPA / Hibernate  
+
+### 🔹 Database
+- MySQL (Production)  
+- H2 (Development)  
+
+### 🔹 Frontend
+- HTML5  
+- Tailwind CSS  
+- JavaScript  
+- Canvas API  
+
+---
+
+## ⚡ Quick Start
+
+### 📌 Prerequisites
+- Java 21+
+- Maven 3.8+
+- MySQL (optional)
+
+---
+
+### 🚀 Setup Steps
+
+```bash
+git clone https://github.com/soniyaukey/gameversehub.git
+cd gameversehub
+mvn clean install🚀 GameVerse Hub - Ultimate Gaming Platform
 
 🎮 Your Ultimate Gaming Universe Awaits!
 
