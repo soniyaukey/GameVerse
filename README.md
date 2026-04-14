@@ -207,7 +207,7 @@ This project is licensed under the MIT License.
 
 If you like this project, give it a ⭐ on GitHub!
 
-![image alt]("https://github.com/soniyaukey/GameVerse/blob/b27415dd1b060fc8fbc674e91af1f27f70399bcb/Screenshot%202026-04-14%20185238.png")
+![image alt](https://github.com/soniyaukey/GameVerse/blob/b27415dd1b060fc8fbc674e91af1f27f70399bcb/Screenshot%202026-04-14%20185238.png)
 
 Made with ❤️ for gamers 🎮
 
