@@ -210,4 +210,4 @@ If you like this project, give it a ⭐ on GitHub!
 
 
 Made with ❤️ for gamers 🎮
-![image Alt](https://github.com/soniyaukey/GameVerse/blob/8ce8a8523ad3d9f583f9ce7bfb41933ead9290ba/Screenshot%202026-04-14%20185238.png)
+![image alt](https://github.com/soniyaukey/GameVerse/blob/8ce8a8523ad3d9f583f9ce7bfb41933ead9290ba/Screenshot%202026-04-14%20185238.png)
