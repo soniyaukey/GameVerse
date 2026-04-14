@@ -111,20 +111,20 @@ EXPOSE 8082
 ENTRYPOINT ["java","-jar","/app.jar"]
 
 📋 Future Enhancements
-Leaderboards
-Reviews & Ratings
-Favorites System
-Multiplayer Games
-Developer Upload System
-PWA Support
-React Frontend
+1.Leaderboards
+2.Reviews & Ratings
+3.Favorites System
+4.Multiplayer Games
+5.Developer Upload System
+6.PWA Support
+7.React Frontend
 
 🤝 Contributing
-Fork the repository
-Create a branch
-Commit changes
-Push to GitHub
-Open Pull Request
+1.Fork the repository
+2.Create a branch
+3.Commit changes
+4.Push to GitHub
+5.Open Pull Request
 
 👩‍💻 Author
 
