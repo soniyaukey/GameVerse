@@ -103,11 +103,13 @@ gameversehub/
 │   ├── static/pages/
 │   └── application.properties
 └── pom.xml
+
 🐳 Docker (Coming Soon)
 FROM openjdk:21-jdk-slim
 COPY target/gameversehub.jar app.jar
 EXPOSE 8082
 ENTRYPOINT ["java","-jar","/app.jar"]
+
 📋 Future Enhancements
 Leaderboards
 Reviews & Ratings
@@ -116,20 +118,24 @@ Multiplayer Games
 Developer Upload System
 PWA Support
 React Frontend
+
 🤝 Contributing
 Fork the repository
 Create a branch
 Commit changes
 Push to GitHub
 Open Pull Request
+
 👩‍💻 Author
 
 Soniya Ukey
 🔗 GitHub: https://github.com/soniyaukey
 
+
 📄 License
 
 This project is licensed under the MIT License.
+
 
 ⭐ Support
 
