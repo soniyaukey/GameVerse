@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Game - GameVerse Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-black min-h-screen p-4">
+    
+    <!-- Loading Spinner -->
+    <div id="loading" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-white text-lg">Loading game...</p>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <a href="games.html" class="fixed top-6 left-6 z-40 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all duration-300 hover:scale-105">← Back to Games</a>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="max-w-4xl mx-auto h-screen pt-24">
+        <!-- Game will be loaded here -->
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script>
+        // Get game ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('id');
+        
+        if (!gameId) {
+            document.getElementById('loading').innerHTML = '<p class="text-red-400 text-xl">No game ID found!</p>';
+            return;
+        }
+
+        async function loadGame() {
+            try {
+                // Hide loading
+                document.getElementById('loading').classList.add('hidden');
+                
+                // Create iframe for snake game (hardcode for now)
+                const iframe = document.createElement('iframe');
+                iframe.src = '../games/snake/index.html';
+                iframe.width = '100%';
+                iframe.height = '600';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '24px';
+                iframe.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)';
+                iframe.frameBorder = '0';
+                iframe.allowFullscreen = true;
+                iframe.src = `../games/snake/index.html`;
+                iframe.style.width = '100%';
+                iframe.style.height = '80vh';
+                iframe.style.border = 'none';
+                iframe.style.borderRadius = '24px';
+                iframe.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.5)';
+                iframe.frameBorder = '0';
+                iframe.allowFullscreen = true;
+                
+                document.getElementById('gameContainer').appendChild(iframe);
+                
+                // Game title
+                const title = document.createElement('h1');
+                title.className = 'text-4xl font-black text-center mb-8 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-2xl';
+                title.textContent = game.title || 'Snake Game';
+                document.getElementById('gameContainer').prepend(title);
+                
+            } catch (error) {
+                document.getElementById('loading').innerHTML = '<p class="text-red-400 text-xl">Game not found!</p>';
+                console.error(error);
+            }
+        }
+
+        loadGame();
+    </script>
+
+</body>
+</html>

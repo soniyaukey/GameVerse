@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 All Games</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- NAVBAR -->
+<nav class="bg-gray-800 p-4 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-yellow-400">🎮 GameVerse Hub</h1>
+    <div class="space-x-4">
+        <a href="../index.html" class="hover:text-yellow-400">Home</a>
+        <a href="login.html" class="hover:text-yellow-400">Login</a>
+        <a href="register.html" class="hover:text-yellow-400">Register</a>
+    </div>
+</nav>
+
+<!-- HEADER -->
+    <div class="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 text-white py-12 mb-8 relative overflow-hidden">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="relative z-10 text-center px-4">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-xl">🎮 All Games</h1>
+            <p class="text-xl md:text-2xl text-cyan-200 drop-shadow-lg mb-6">Choose your favorite game and dive into the action!</p>
+        </div>
+        <div class="flex justify-center gap-4 flex-wrap">
+            <div class="bg-white/10 backdrop-blur-md px-8 py-4 rounded-full border border-white/20">
+                <span class="text-lg font-bold text-yellow-300">14+ Games Loaded</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FILTER BUTTONS -->
+<div class="flex justify-center gap-3 mb-16 p-4">
+    <button onclick="filterGames('ALL')" id="btn-ALL" class="px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all duration-300 text-lg">All Games</button>
+        <button onclick="filterGames('OFFLINE')" id="btn-OFFLINE" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-green-500 text-black font-bold rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all duration-300 text-lg">🕹️ Offline Games</button>
+    <a href="https://www.crazygames.com/" target="_blank" class="px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-black font-bold rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transform transition-all duration-300 text-lg block text-center" id="btn-ONLINE">🌐 Play Online Games</a>
+</div>
+
+<!-- LOADING -->
+<p id="loadingMsg" class="text-center text-gray-400 text-lg">Loading games...</p>
+
+<!-- GAMES GRID -->
+<div id="gamesContainer" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-10 pb-10"></div>
+
+<!-- ERROR -->
+<p id="errorMsg" class="text-center text-red-400 text-lg hidden">Failed to load games. Make sure the server is running.</p>
+
+<script src="../js/api.js"></script>
+<script>
+    let allGames = [];
+
+    async function loadGames() {
+        try {
+            const res = await fetch('/api/games');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            allGames = await res.json();
+            document.getElementById('loadingMsg').classList.add('hidden');
+            renderGames(allGames);
+        } catch (e) {
+            document.getElementById('loadingMsg').classList.add('hidden');
+            document.getElementById('errorMsg').classList.remove('hidden');
+        }
+    }
+
+    function renderGames(games) {
+        const container = document.getElementById('gamesContainer');
+        if (games.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-400 col-span-3 text-2xl font-bold">No games found 😔</p>';
+            return;
+        }
+        container.innerHTML = games.map(game => `
+            <div class="group bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-2xl p-6 hover:from-gray-700 hover:to-gray-800 hover:border-yellow-400 hover:shadow-2xl hover:scale-105 transition-all duration-500 backdrop-blur-sm relative overflow-hidden card fade-in">
+                <div class="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full blur-xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
+                <div class="relative w-full h-52 rounded-xl overflow-hidden bg-gradient-to-b from-blue-900/50 to-purple-900/50 mb-6 border-4 border-white/10">
+                    ${game.imageUrl || game.thumbnail
+                        ? `<img src="${game.imageUrl || game.thumbnail}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500 group-hover:scale-110" alt="${game.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgZm9udC1mYW1pbHk9IkFyaWFsIiBmaWxsPSIjZGRkIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1MCUiIHk9IjUwJSI+8J+Pguy8L3RleHQ+PC9zdmc+'" />`
+                        : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-600">
+                             <span class="text-6xl drop-shadow-lg">🎮</span>
+                           </div>`}
+                </div>
+                <div class="absolute top-4 left-4">
+                    <span class="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold border border-white/20 ${game.gameType === 'ONLINE' ? 'bg-blue-500/20 text-blue-200' : 'bg-green-500/20 text-green-200'}">
+                        ${game.gameType === 'ONLINE' ? '🌐 Online' : '🕹️ Offline'}
+                    </span>
+                </div>
+                <h3 class="text-2xl font-black mb-3 bg-gradient-to-r from-white to-gray-200 bg-clip-text">${game.title}</h3>
+                <p class="text-gray-300 text-sm mb-4 leading-relaxed">${game.category || 'Action & Adventure'}</p>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-1">
+                        ${Array.from({length: 5}, (_, i) => `
+                            <span class="text-xs ${i < Math.floor(Math.random() * 5) + 1 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-500 fill-gray-500'}">⭐</span>
+                        `).join('')}
+                        <span class="text-xs text-gray-400 ml-1">${(Math.floor(Math.random() * 5) + 1).toFixed(1)} (${Math.floor(Math.random() * 100) + 50}+)</span>
+                    </div>
+                    <span class="text-xs text-gray-400">${game.status || 'Live'}</span>
+                </div>
+                <button onclick="playGame(${game.id}, '${game.gameType}', '${game.gameUrl || ''}', '${game.gamePath || ''}')"
+                        class="play-btn w-full text-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-lg hover:shadow-emerald-500/25 transform hover:scale-[1.02] transition-all duration-300 font-bold py-3 rounded-xl">
+                    ▶️ Play Now
+                </button>
+            </div>
+        `).join('');
+    }
+
+    function filterGames(type) {
+        document.querySelectorAll('[id^=btn-]').forEach(b => b.classList.replace('bg-yellow-400', 'bg-gray-600') || b.classList.add('bg-gray-600'));
+        const active = document.getElementById('btn-' + type);
+        active.classList.remove('bg-gray-600');
+        active.classList.add('bg-yellow-400');
+
+        if (type === 'ALL') renderGames(allGames);
+        else renderGames(allGames.filter(g => g.gameType === type));
+    }
+
+    function playGame(id, gameType, gameUrl, gamePath) {
+        if (gameType === 'ONLINE') {
+            window.open(gameUrl, '_blank');
+        } else {
+            window.location.href = `../games/${gamePath}/index.html`;
+        }
+    }
+
+    loadGames();
+</script>
+
+<!-- ANIMATED FOOTER -->
+<footer class="bg-gradient-to-r from-gray-900 via-gray-800 to-black pt-20 pb-12 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-blue-500/5 animate-pulse"></div>
+    <div class="relative z-10 text-center px-8">
+        <div class="inline-block p-4 bg-gradient-to-r from-pink-500 via-rose-500 to-orange-500 bg-clip-text text-transparent text-4xl font-black mb-6 animate-pulse drop-shadow-2xl tracking-wider">
+            Made with ❤️ by Soniya Ukey
+        </div>
+        <p class="text-xl text-gray-400 font-medium animate-fade-in-up mb-4">Your Gaming Universe Awaits</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-6 text-lg text-gray-300 mt-8 max-w-2xl mx-auto">
+            <a href="../index.html" class="hover:text-pink-400 transition-colors duration-300 group">
+                <i class="fas fa-home mr-2 group-hover:animate-bounce"></i>Home
+            </a>
+            <span>|</span>
+            <a href="login.html" class="hover:text-yellow-400 transition-colors duration-300 group">
+                <i class="fas fa-sign-in-alt mr-2 group-hover:spin"></i>Login
+            </a>
+            <span>|</span>
+            <a href="register.html" class="hover:text-emerald-400 transition-colors duration-300 group">
+                <i class="fas fa-user-plus mr-2 group-hover:pulse"></i>Register
+            </a>
+        </div>
+        <div class="mt-12 pt-12 border-t border-gray-700">
+            <p class="text-gray-500 text-sm">&copy; 2026 GameVerse Hub. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-up {
+    animation: fade-in-up 1s ease-out;
+}
+.group-hover\:spin:hover i { animation: spin 1s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.group-hover\:pulse:hover i { animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+.group-hover\:bounce:hover i { animation: bounce 1s infinite; }
+</style>
+
+</body>
+</html>

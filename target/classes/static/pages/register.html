@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register • GameVerse Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { 
+            background: linear-gradient(-45deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass { 
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+        .form-glow { box-shadow: 0 30px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.15); }
+        .btn-glow { box-shadow: 0 12px 35px rgba(16,185,129,0.5); }
+        .btn-glow:hover { box-shadow: 0 18px 50px rgba(16,185,129,0.7); transform: translateY(-3px); }
+        .input-glow:focus { box-shadow: 0 0 0 4px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-12px); } }
+        .float { animation: float 7s ease-in-out infinite; }
+        .toast { animation: slideInRight 0.4s cubic-bezier(0.25,0.46,0.45,0.94); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 pointer-events-none">
+        <div class="absolute -top-48 -right-48 w-96 h-96 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl float" style="animation-delay: 0s;"></div>
+        <div class="absolute -bottom-48 -left-48 w-80 h-80 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl float" style="animation-delay: -3s;"></div>
+        <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-indigo-400/20 to-blue-400/20 rounded-full blur-3xl float" style="animation-delay: -6s;"></div>
+    </div>
+
+    <!-- Registration Form -->
+    <main class="w-full max-w-lg glass rounded-3xl p-12 form-glow">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <div class="w-28 h-28 bg-gradient-to-br from-emerald-400 via-teal-400 to-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl form-glow">
+                <i class="fas fa-user-plus text-4xl text-black font-bold"></i>
+            </div>
+            <h1 class="text-5xl font-black bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-3 drop-shadow-2xl">
+                Join GameVerse
+            </h1>
+            <p class="text-xl text-gray-300 leading-relaxed">Create your account and dive into gaming adventure!</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="registerForm" class="space-y-6">
+            <!-- Name -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-200 mb-3 flex items-center gap-3">
+                    <i class="fas fa-user text-emerald-400"></i>
+                    Full Name
+                </label>
+                <input type="text" id="name" required minlength="2"
+                       class="w-full px-6 py-5 bg-white/15 border border-white/25 rounded-2xl text-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/40 input-glow transition-all duration-400 shadow-inner"
+                       placeholder="Enter your name">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-200 mb-3 flex items-center gap-3">
+                    <i class="fas fa-envelope text-emerald-400"></i>
+                    Email Address
+                </label>
+                <input type="email" id="email" required
+                       class="w-full px-6 py-5 bg-white/15 border border-white/25 rounded-2xl text-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/40 input-glow transition-all duration-400 shadow-inner"
+                       placeholder="your@email.com">
+            </div>
+
+            <!-- Password -->
+            <div class="relative">
+                <label class="block text-lg font-semibold text-gray-200 mb-3 flex items-center gap-3">
+                    <i class="fas fa-lock text-emerald-400"></i>
+                    Password
+                </label>
+                <div class="flex gap-3 mb-2 text-xs text-gray-400">
+                    <span>• 8+ characters</span>
+                    <span>• 1 uppercase</span>
+                    <span>• 1 number</span>
+                </div>
+                <input type="password" id="password" required minlength="8"
+                       class="w-full pr-14 px-6 py-5 bg-white/15 border border-white/25 rounded-2xl text-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/40 input-glow transition-all duration-400 shadow-inner"
+                       placeholder="Create strong password">
+                <button type="button" id="togglePassword" class="absolute right-5 top-[76px] text-gray-400 hover:text-white p-2 transition-colors">
+                    <i class="fas fa-eye text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="relative">
+                <label class="block text-lg font-semibold text-gray-200 mb-3 flex items-center gap-3">
+                    <i class="fas fa-lock-open text-emerald-400"></i>
+                    Confirm Password
+                </label>
+                <input type="password" id="confirmPassword" required minlength="8"
+                       class="w-full pr-14 px-6 py-5 bg-white/15 border border-white/25 rounded-2xl text-lg text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-emerald-500/40 input-glow transition-all duration-400 shadow-inner"
+                       placeholder="Confirm your password">
+            </div>
+
+            <!-- Terms Checkbox -->
+            <div class="flex items-center gap-3 p-4 bg-white/5 border border-white/20 rounded-xl">
+                <input type="checkbox" id="terms" required class="w-5 h-5 bg-white/20 border-2 border-white/30 rounded focus:ring-emerald-500 text-emerald-500 shadow-md">
+                <label for="terms" class="text-sm text-gray-300 leading-tight">
+                    I agree to <a href="#" class="text-emerald-400 hover:text-emerald-300 font-semibold">Terms & Conditions</a> 
+                    and <a href="#" class="text-emerald-400 hover:text-emerald-300 font-semibold">Privacy Policy</a>
+                </label>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" id="registerBtn"
+                    class="w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-700 text-black font-black text-xl py-6 px-10 rounded-3xl btn-glow shadow-2xl transform transition-all duration-400 uppercase tracking-wide shadow-emerald-500/50">
+                <i class="fas fa-rocket mr-3"></i>
+                Create Account
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-12">
+            <div class="absolute inset-0 flex items-center">
+                <span class="w-full border-t border-white/20"></span>
+            </div>
+            <div class="relative flex justify-center text-sm uppercase tracking-wide">
+                <span class="px-6 bg-gray-900/90 py-2 text-gray-400 border border-white/20 rounded-full">or</span>
+            </div>
+        </div>
+
+        <!-- Login Link -->
+        <a href="login.html" class="block w-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-800 hover:from-gray-600 hover:via-gray-500 hover:to-gray-700 text-white font-semibold text-lg py-5 px-10 rounded-3xl text-center glass hover:shadow-xl transition-all duration-400 border border-white/20 hover:border-white/40">
+            <i class="fas fa-sign-in-alt mr-3"></i>
+            Already have account? Sign In
+        </a>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-8 right-8 hidden p-6 rounded-3xl shadow-2xl text-lg font-semibold z-50 glass border">
+        <i class="fas fa-circle-check mr-4 text-emerald-400 text-xl float"></i>
+        <span id="toastMessage"></span>
+        <button onclick="hideToast()" class="ml-4 text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        togglePassword.onclick = () => {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            togglePassword.innerHTML = `<i class="fas fa-${type === 'password' ? 'eye' : 'eye-slash'} text-lg"></i>`;
+        };
+
+        // Form validation & submission
+        document.getElementById('registerForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const registerBtn = document.getElementById('registerBtn');
+            
+            // Client validation
+            if (!name || !email || !password || !confirmPassword) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                document.getElementById('confirmPassword').focus();
+                return;
+            }
+            
+            if (password.length < 8) {
+                showToast('Password must be at least 8 characters', 'error');
+                return;
+            }
+            
+            if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+                showToast('Password needs uppercase, lowercase & number', 'error');
+                return;
+            }
+            
+            // Loading state
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>Creating Account...';
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role: 'USER' })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showToast('Account created! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showToast('Network error. Please check connection.', 'error');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = '<i class="fas fa-rocket mr-3"></i>Create Account';
+            }
+        };
+
+        // Toast system
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            const msg = document.getElementById('toastMessage');
+            
+            msg.textContent = message;
+            toast.classList.remove('hidden');
+            
+            if (type === 'success') {
+                toast.style.background = 'rgba(34,197,94,0.9)';
+                toast.style.borderColor = 'rgba(34,197,94,0.5)';
+                icon.className = 'fas fa-circle-check mr-4 text-emerald-50 text-xl float';
+            } else {
+                toast.style.background = 'rgba(239,68,68,0.9)';
+                toast.style.borderColor = 'rgba(239,68,68,0.5)';
+                icon.className = 'fas fa-exclamation-triangle mr-4 text-red-50 text-xl float';
+            }
+            
+            setTimeout(hideToast, 5000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').classList.add('hidden');
+        }
+
+        // Enter key submit
+        document.addEventListener('keypress', e => {
+            if (e.key === 'Enter' && document.activeElement.tagName !== 'INPUT') {
+                document.getElementById('registerForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // Input animations
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', () => input.parentElement.classList.add('ring-4', 'ring-emerald-500/30'));
+            input.addEventListener('blur', () => input.parentElement.classList.remove('ring-4', 'ring-emerald-500/30'));
+        });
+    </script>
+</body>
+</html>

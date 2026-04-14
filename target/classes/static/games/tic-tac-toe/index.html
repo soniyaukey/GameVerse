@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✖️ Tic Tac Toe - GameVerse Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f0f23 50%, #1a182e 100%);
+            min-height: 100vh;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .board { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; 
+            max-width: 480px; 
+            margin: 0 auto;
+        }
+        .board-cell {
+            aspect-ratio: 1; 
+            border: 4px solid rgba(99, 102, 241, 0.5); 
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95)); 
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        .board-cell::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .board-cell:hover:not(.disabled)::before {
+            left: 100%;
+        }
+        .board-cell:hover:not(.disabled) {
+            transform: translateY(-8px) scale(1.05);
+            border-color: #6366f1;
+            box-shadow: 0 25px 50px rgba(99, 102, 241, 0.4);
+            background: linear-gradient(135deg, rgba(31, 41, 55, 1), rgba(17, 24, 39, 1));
+        }
+        .board-cell.x { color: #f87171; text-shadow: 0 0 25px #ef4444; }
+        .board-cell.o { color: #60a5fa; text-shadow: 0 0 25px #3b82f6; }
+        .board-cell.winner { 
+            animation: winnerPulse 1s infinite alternate;
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(16, 185, 129, 0.95)) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 50px rgba(34, 197, 94, 0.9) !important;
+            transform: scale(1.15) !important;
+        }
+        @keyframes winnerPulse {
+            0% { transform: scale(1.15); box-shadow: 0 0 50px rgba(34, 197, 94, 0.9); }
+            100% { transform: scale(1.25); box-shadow: 0 0 70px rgba(34, 197, 94, 1); }
+        }
+        .glow { box-shadow: 0 0 20px rgba(99,102,241,0.6); }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.6); } 50% { box-shadow: 0 0 40px rgba(99,102,241,1); } }
+        #statusContainer { color: white !important; text-shadow: none !important; }
+        .status-text { color: #f8fafc !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95vw] max-w-3xl bg-gradient-to-r from-gray-900/98 to-gray-800/98 backdrop-blur-2xl border border-indigo-600/60 rounded-2xl px-8 py-6 shadow-[0_25px_50px_rgba(0,0,0,0.5)]">
+        <div class="flex items-center justify-between">
+            <a href="../../pages/games.html" class="text-2xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent hover:scale-[1.1] transition-all duration-300 group">
+                ← All Games
+            </a>
+            <h1 class="text-3xl font-black bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-xl mx-auto text-center">✖️ Tic Tac Toe</h1>
+            <div class="text-right space-y-1">
+                <div class="text-lg opacity-90">Game Stats</div>
+                <div class="flex gap-6 text-xl font-black">
+                    <span class="text-red-400 glow">❌ <span id="xWins">0</span></span>
+                    <span class="text-blue-400 glow">⭕ <span id="oWins">0</span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="min-h-screen pt-36 pb-20 flex flex-col items-center justify-center space-y-16 px-4">
+        
+        <!-- Mode Selection -->
+        <div id="modeScreen" class="text-center space-y-12 w-full max-w-4xl">
+            <h1 class="text-6xl md:text-7xl font-black bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_80px_rgba(255,165,0,0.6)] leading-tight">Select Battle Mode</h1>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 max-w-5xl mx-auto">
+                <button onclick="startGame('2p')" class="group relative overflow-hidden p-12 border-4 border-emerald-400/60 bg-gradient-to-br from-emerald-500/25 to-teal-600/25 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(16,185,129,0.3)] hover:shadow-[0_30px_80px_rgba(16,185,129,0.5)] hover:scale-[1.02] transition-all duration-500 hover:border-emerald-400 font-black text-3xl md:text-4xl text-white hover:text-emerald-900 min-h-[200px]">
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20" id="hoverEffect2p"></div>
+                    <div class="relative z-10 space-y-6">
+                        <div class="text-8xl md:text-9xl mb-8">👥</div>
+                        <div class="text-4xl md:text-5xl mb-4 drop-shadow-lg">2 Players</div>
+                        <div class="text-2xl opacity-90 drop-shadow-md">Face your friend</div>
+                    </div>
+                </button>
+                <button onclick="startGame('cpu')" class="group relative overflow-hidden p-12 border-4 border-orange-400/60 bg-gradient-to-br from-orange-500/25 to-red-600/25 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(251,146,60,0.3)] hover:shadow-[0_30px_80px_rgba(251,146,60,0.5)] hover:scale-[1.02] transition-all duration-500 hover:border-orange-400 font-black text-3xl md:text-4xl text-white hover:text-orange-900 min-h-[200px]">
+                    <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20" id="hoverEffectCpu"></div>
+                    <div class="relative z-10 space-y-6">
+                        <div class="text-8xl md:text-9xl mb-8">🤖</div>
+                        <div class="text-4xl md:text-5xl mb-4 drop-shadow-lg">vs Computer</div>
+                        <div class="text-2xl opacity-90 drop-shadow-md">Challenge AI</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden w-full max-w-4xl space-y-12">
+            
+            <!-- Status -->
+            <div id="statusDiv" class="p-8 bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-3xl border-2 border-indigo-500/50 shadow-2xl text-center max-w-2xl mx-auto">
+                <div class="text-4xl font-black text-white drop-shadow-lg mb-4 pulse-glow" id="turnIndicator">Player X to Play</div>
+            </div>
+
+            <!-- Score -->
+            <div class="grid grid-cols-3 gap-8 p-8 bg-gray-800/80 backdrop-blur-xl rounded-3xl border border-indigo-500/40 shadow-2xl max-w-xl mx-auto">
+                <div class="text-center">
+                    <div class="text-6xl mb-4 animate-pulse">❌</div>
+                    <div class="text-3xl font-black text-red-400 glow" id="scoreX">0</div>
+                </div>
+                <div class="text-center border-l-4 border-r-4 border-indigo-400/70 py-12">
+                    <div class="text-2xl opacity-80 mb-4 text-gray-300">Draws</div>
+                    <div class="text-3xl font-black text-gray-400 glow" id="scoreDraw">0</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-6xl mb-4 animate-pulse">⭕</div>
+                    <div class="text-3xl font-black text-blue-400 glow" id="scoreO">0</div>
+                </div>
+            </div>
+
+            <!-- Game Board -->
+            <div id="boardDiv" class="p-12 bg-gray-900/70 backdrop-blur-xl rounded-4xl border-4 border-indigo-500/40 shadow-2xl max-w-2xl mx-auto opacity-50 pointer-events-none">
+                <div id="board" class="board">
+                    <button class="board-cell" data-index="0"></button>
+                    <button class="board-cell" data-index="1"></button>
+                    <button class="board-cell" data-index="2"></button>
+                    <button class="board-cell" data-index="3"></button>
+                    <button class="board-cell" data-index="4"></button>
+                    <button class="board-cell" data-index="5"></button>
+                    <button class="board-cell" data-index="6"></button>
+                    <button class="board-cell" data-index="7"></button>
+                    <button class="board-cell" data-index="8"></button>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-8 justify-center">
+                <button id="newGameButton" class="px-20 py-8 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-black text-2xl rounded-3xl shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300 hidden">🔄 New Game</button>
+            </div>
+        </div>
+
+        <!-- Victory Modal -->
+        <div id="modalVictory" class="fixed inset-0 bg-black/98 backdrop-blur-3xl flex items-center justify-center z-50 hidden p-8 animate-fadeIn">
+            <div class="bg-gradient-to-b from-emerald-500/95 to-teal-600/95 border-8 border-emerald-400/70 backdrop-blur-3xl rounded-4xl p-16 md:p-24 text-center shadow-[0_50px_100px_rgba(0,0,0,0.8)] max-w-3xl w-full mx-8">
+                <div class="text-[10rem] mb-16 animate-bounceScale drop-shadow-4xl" id="victoryEmoji">🏆</div>
+                <h1 class="text-6xl md:text-8xl font-black mb-12 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_0_100px_rgba(255,193,7,0.8)]" id="victoryTitle">Victory!</h1>
+                <p class="text-4xl md:text-5xl font-bold text-white mb-20 drop-shadow-2xl" id="victorySubtitle">Player X Wins!</p>
+                <div class="flex gap-12 justify-center">
+                    <button onclick="playAgain()" class="px-24 py-12 bg-gradient-to-r from-white to-gray-100 text-gray-900 font-black text-3xl rounded-4xl shadow-2xl hover:shadow-white/80 hover:scale-110 transition-all duration-400 backdrop-blur-xl border-4 border-white/50">🔄 Play Again</button>
+                    <button onclick="returnHome()" class="px-24 py-12 bg-gradient-to-r from-slate-800 to-gray-900 text-white font-black text-3xl rounded-4xl shadow-2xl hover:shadow-slate-500 hover:scale-110 transition-all duration-400 backdrop-blur-xl border-4 border-slate-500/50">🏠 Main Games</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let board = Array(9).fill('');
+        let currentPlayer = 'X';
+        let gameActive = false;
+        let gameMode = '';
+        let gameScores = {x: 0, o: 0, draws: 0};
+
+        const WIN_PATTERNS = [
+            [0,1,2], [3,4,5], [6,7,8], // rows
+            [0,3,6], [1,4,7], [2,5,8], // cols
+            [0,4,8], [2,4,6] // diagonals
+        ];
+
+        // Mode Selection
+        function startGame(mode) {
+            gameMode = mode;
+            document.getElementById('modeScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            newGame();
+        }
+
+        // New Game
+        function newGame() {
+            board = Array(9).fill('');
+            currentPlayer = 'X';
+            gameActive = true;
+            updateBoard();
+            updateTurnDisplay();
+            document.getElementById('boardDiv').classList.remove('opacity-50', 'pointer-events-none');
+            document.querySelectorAll('.board-cell').forEach(cell => {
+                cell.classList.remove('x', 'o', 'winner');
+                cell.disabled = false;
+            });
+            updateScoreDisplay();
+        }
+
+        // Update Board Display
+        function updateBoard() {
+            document.querySelectorAll('.board-cell').forEach((cell, i) => {
+                cell.textContent = board[i];
+                cell.className = 'board-cell';
+                if (board[i] === 'X') cell.classList.add('x');
+                if (board[i] === 'O') cell.classList.add('o');
+            });
+        }
+
+        // Turn Display
+        function updateTurnDisplay() {
+            document.getElementById('turnIndicator').textContent = gameActive ? 
+                `Player ${currentPlayer}'s turn` : 'Game Over - Click New Game';
+        }
+
+        // Cell Click Handler
+        document.querySelectorAll('.board-cell').forEach(cell => {
+            cell.addEventListener('click', function() {
+                const index = parseInt(this.dataset.index);
+                if (board[index] !== '' || !gameActive) return;
+                
+                board[index] = currentPlayer;
+                this.textContent = currentPlayer;
+                this.classList.add(currentPlayer.toLowerCase());
+
+                if (checkWin(currentPlayer)) {
+                    gameActive = false;
+                    highlightWinningCombo();
+                    if (currentPlayer === 'X') gameScores.x++; else gameScores.o++;
+                    setTimeout(() => showVictoryModal(`${currentPlayer} Wins!`, currentPlayer), 300);
+                    return;
+                }
+
+                if (checkDraw()) {
+                    gameActive = false;
+                    gameScores.draws++;
+                    setTimeout(() => showVictoryModal("It's a Draw!", 'draw'), 300);
+                    return;
+                }
+
+                // Switch player
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                updateTurnDisplay();
+
+                // AI turn
+                if (gameMode === 'cpu' && currentPlayer === 'O') {
+                    setTimeout(computerTurn, 400 + Math.random() * 600);
+                }
+            });
+        });
+
+        // Computer AI
+        function computerTurn() {
+            // 1. Check winning move
+            for (let pattern of WIN_PATTERNS) {
+                let emptyCells = pattern.filter(i => board[i] === '');
+                if (emptyCells.length === 1 && board[pattern[0]] === 'O' && board[pattern[1]] === 'O') {
+                    makeAIMove(emptyCells[0]);
+                    return;
+                }
+            }
+
+            // 2. Block opponent's win
+            for (let pattern of WIN_PATTERNS) {
+                let emptyCells = pattern.filter(i => board[i] === '');
+                if (emptyCells.length === 1 && board[pattern[0]] === 'X' && board[pattern[1]] === 'X') {
+                    makeAIMove(emptyCells[0]);
+                    return;
+                }
+            }
+
+            // 3. Center
+            if (board[4] === '') {
+                makeAIMove(4);
+                return;
+            }
+
+            // 4. Corners
+            const corners = [0,2,6,8];
+            for (let corner of corners) {
+                if (board[corner] === '') {
+                    makeAIMove(corner);
+                    return;
+                }
+            }
+
+            // 5. Sides
+            const sides = [1,3,5,7];
+            for (let side of sides) {
+                if (board[side] === '') {
+                    makeAIMove(side);
+                    return;
+                }
+            }
+        }
+
+        function makeAIMove(index) {
+            board[index] = 'O';
+            const cell = document.querySelector(`[data-index="${index}"]`);
+            cell.textContent = 'O';
+            cell.classList.add('o');
+
+            checkGameEnd('O');
+        }
+
+        function checkWin(player) {
+            return WIN_PATTERNS.some(pattern => {
+                return pattern.every(i => board[i] === player);
+            });
+        }
+
+        function checkDraw() {
+            return board.every(cell => cell !== '');
+        }
+
+        function checkGameEnd(player) {
+            if (checkWin(player)) {
+                gameActive = false;
+                highlightWinningCombo();
+                if (player === 'X') gameScores.x++; else gameScores.o++;
+                showVictoryModal(`${player} Wins!`, player);
+                return true;
+            }
+            if (checkDraw()) {
+                gameActive = false;
+                gameScores.draws++;
+                showVictoryModal("It's a Draw!", 'draw');
+                return true;
+            }
+            return false;
+        }
+
+        function highlightWinningCombo() {
+            for (let pattern of WIN_PATTERNS) {
+                if (pattern.every(i => board[i] === currentPlayer)) {
+                    pattern.forEach(i => {
+                        document.querySelector(`[data-index="${i}"]`).classList.add('winner');
+                    });
+                    break;
+                }
+            }
+        }
+
+        function showVictoryModal(message, winner) {
+            document.getElementById('victoryEmoji').textContent = winner === 'draw' ? '🤝' : (winner === 'X' ? '❌' : '⭕');
+            document.getElementById('victoryTitle').textContent = message;
+            document.getElementById('victorySubtitle').textContent = `Score: X ${gameScores.x} | O ${gameScores.o}`;
+            document.getElementById('modalVictory').classList.remove('hidden');
+            updateScoreDisplay();
+        }
+
+        function playAgain() {
+            document.getElementById('modalVictory').classList.add('hidden');
+            newGame();
+        }
+
+        function returnHome() {
+            window.location.href = '../../pages/games.html';
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scoreX').textContent = gameScores.x;
+            document.getElementById('scoreO').textContent = gameScores.o;
+            document.getElementById('scoreDraw').textContent = gameScores.draws;
+        }
+
+        document.getElementById('newGameButton').onclick = newGame;
+        document.getElementById('resetBtn').onclick = newGame;
+    </script>
+
+</body>
+</html>

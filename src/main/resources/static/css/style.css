@@ -1,0 +1,142 @@
+/* 🔹 GLOBAL RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 🔹 BODY */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #111827;
+    color: white;
+}
+
+/* 🔹 SCROLLBAR (COOL UI 🔥) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #facc15;
+    border-radius: 10px;
+}
+
+/* 🔹 BUTTON EFFECT */
+.btn {
+    background: #facc15;
+    color: black;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.btn:hover {
+    background: #fde047;
+    transform: scale(1.05);
+}
+
+/* 🔹 CARD STYLE */
+.card {
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* 🔹 GAME IMAGE */
+.game-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* 🔹 PLAY BUTTON */
+.play-btn {
+    display: inline-block;
+    margin-top: 10px;
+    background: #22c55e;
+    padding: 8px 15px;
+    border-radius: 6px;
+    color: white;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.play-btn:hover {
+    background: #16a34a;
+}
+
+/* 🔹 INPUT FIELDS */
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    margin: 8px 0;
+}
+
+/* 🔹 FORM CONTAINER */
+.form-container {
+    max-width: 400px;
+    margin: auto;
+    background: #1f2937;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* 🔹 NAVBAR STYLES */
+nav h1 {
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+}
+
+nav .space-x-4 a {
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+}
+
+nav a {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #facc15, #f59e0b, #facc15);
+    transition: width 0.3s ease;
+}
+
+nav a:hover {
+    color: #facc15;
+    text-shadow: 0 0 10px #facc15aa;
+    transform: translateY(-2px);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+/* 🔹 ANIMATION (FADE IN 🔥) */
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

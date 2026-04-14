@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Snake Game - GameVerse Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        canvas { 
+            border: 4px solid #4f46e5; 
+            border-radius: 16px; 
+            box-shadow: 0 20px 40px rgba(79,70,229,0.4), inset 0 0 20px rgba(255,255,255,0.1);
+        }
+        .glow { box-shadow: 0 0 20px rgba(16,185,129,0.6); }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(16,185,129,0.6); } 50% { box-shadow: 0 0 40px rgba(16,185,129,1); } }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+        body { background: linear-gradient(135deg, #1e1b4b 0%, #0f0f23 50%, #1a1a2e 100%); }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12 flex flex-col items-center justify-center text-white font-sans">
+
+    <!-- Navbar -->
+    <nav class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-800/90 to-gray-900/90 backdrop-blur-xl p-4 rounded-2xl border border-indigo-500/30 z-50 shadow-2xl w-full max-w-2xl">
+        <div class="flex justify-between items-center">
+            <a href="../../pages/games.html" class="text-yellow-400 hover:text-yellow-300 font-bold text-xl transition-all duration-300">← All Games</a>
+            <h1 class="text-2xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent drop-shadow-lg">🐍 Snake Game</h1>
+        </div>
+    </nav>
+
+    <!-- Game Area -->
+    <div class="pt-28 pb-12 w-full max-w-2xl">
+        <!-- Score & Speed -->
+        <div class="flex justify-between items-center mb-8 p-6 bg-gray-800/50 backdrop-blur-md rounded-2xl border border-indigo-500/30">
+            <div class="flex items-center gap-4">
+                <button onclick="changeSpeed(-1)" class="p-3 bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-500 hover:to-gray-600 text-white font-bold rounded-xl shadow-lg hover:shadow-slate-400/50 transform hover:scale-105 transition-all duration-300 px-6">−</button>
+                <span id="speedDisplay" class="text-2xl font-black text-yellow-400 glow pulse-glow">Speed: 1</span>
+                <button onclick="changeSpeed(1)" class="p-3 bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-500 hover:to-gray-600 text-white font-bold rounded-xl shadow-lg hover:shadow-slate-400/50 transform hover:scale-105 transition-all duration-300 px-6">+</button>
+            </div>
+            <div id="scoreDisplay" class="text-3xl font-black text-emerald-400 glow pulse-glow">Score: 0</div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="text-center mb-12">
+            <canvas id="gameCanvas" width="450" height="450" class="mx-auto block"></canvas>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex gap-4 justify-center flex-wrap">
+            <button id="startBtn" class="px-12 py-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-black font-black text-xl rounded-3xl shadow-2xl hover:shadow-emerald-500/50 hover:scale-105 transition-all duration-300">▶ Start Game</button>
+            <button id="pauseBtn" class="px-12 py-6 bg-gradient-to-r from-slate-700 to-gray-800 text-white font-black text-xl rounded-3xl shadow-2xl hover:shadow-slate-500/50 hover:scale-105 transition-all duration-300 hidden">⏸ Pause</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center hidden z-50 p-8">
+        <div class="bg-gradient-to-b from-gray-800/95 to-gray-900/95 border-4 border-purple-500/50 backdrop-blur-xl rounded-3xl p-12 md:p-16 text-center max-w-lg w-full shadow-2xl">
+            <div class="text-8xl mb-8 animate-pulse">💀</div>
+            <h2 class="text-4xl md:text-5xl font-black mb-6 bg-gradient-to-r from-red-400 via-pink-400 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl">Game Over!</h2>
+            <p class="text-3xl md:text-4xl text-gray-100 mb-12 font-bold" id="finalScore">Final Score: 0</p>
+            <button id="restartBtn" class="px-16 py-6 md:px-20 md:py-8 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-500 text-black font-black text-2xl rounded-3xl shadow-2xl hover:shadow-yellow-500/50 hover:scale-105 transition-all duration-300 transform">🔄 Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 20;
+        const tileCount = canvas.width / gridSize;
+
+        let snake = [{x: 11, y: 11}];
+        let food = {x: 15, y: 15};
+        let dx = 0, dy = 0;
+        let score = 0;
+        let speed = 150; // ms
+        let gameRunning = false;
+        let gameLoop;
+
+        // Initial draw
+        function draw() {
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1e293b');
+            gradient.addColorStop(1, '#0f172a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= tileCount; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * gridSize, 0);
+                ctx.lineTo(i * gridSize, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, i * gridSize);
+                ctx.lineTo(canvas.width, i * gridSize);
+                ctx.stroke();
+            }
+
+            // Food (glowing ball)
+            ctx.shadowColor = '#f59e0b';
+            ctx.shadowBlur = 25;
+            ctx.beginPath();
+            ctx.arc((food.x + 0.5) * gridSize, (food.y + 0.5) * gridSize, gridSize/2 - 1, 0, Math.PI * 2);
+            const foodGradient = ctx.createRadialGradient(
+                (food.x + 0.5) * gridSize, (food.y + 0.5) * gridSize, 0,
+                (food.x + 0.5) * gridSize, (food.y + 0.5) * gridSize, gridSize/2
+            );
+            foodGradient.addColorStop(0, '#fde68a');
+            foodGradient.addColorStop(0.6, '#f59e0b');
+            foodGradient.addColorStop(1, '#d97706');
+            ctx.fillStyle = foodGradient;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Snake
+            snake.forEach((segment, index) => {
+                ctx.shadowColor = '#10b981';
+                ctx.shadowBlur = index === 0 ? 30 : 15;
+                ctx.fillStyle = index === 0 ? '#059669' : '#10b981';
+                ctx.fillRect(segment.x * gridSize + 1, segment.y * gridSize + 1, gridSize - 2, gridSize - 2);
+            });
+            ctx.shadowBlur = 0;
+        }
+
+        function update() {
+            if (!gameRunning) return;
+
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+
+            // Wall collision
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver();
+                return;
+            }
+
+            // Self collision
+            for (let segment of snake) {
+                if (head.x === segment.x && head.y === segment.y) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+
+            // Food collision
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+                document.getElementById('scoreDisplay').classList.add('pulse-glow');
+                setTimeout(() => document.getElementById('scoreDisplay').classList.remove('pulse-glow'), 500);
+                randomFood();
+            } else {
+                snake.pop();
+            }
+
+            draw();
+        }
+
+        function randomFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+            // Avoid snake body
+            for (let segment of snake) {
+                if (food.x === segment.x && food.y === segment.y) {
+                    randomFood();
+                    return;
+                }
+            }
+        }
+
+        // Controls
+        document.addEventListener('keydown', e => {
+            const LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40;
+            if (e.keyCode === LEFT && dx !== 1) { dx = -1; dy = 0; }
+            if (e.keyCode === UP && dy !== 1) { dx = 0; dy = -1; }
+            if (e.keyCode === RIGHT && dx !== -1) { dx = 1; dy = 0; }
+            if (e.keyCode === DOWN && dy !== -1) { dx = 0; dy = 1; }
+        });
+
+        // Touch controls
+        let touchStartX = 0, touchStartY = 0;
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        canvas.addEventListener('touchend', e => {
+            e.preventDefault();
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && dx !== 1) { dx = -1; dy = 0; }
+                else if (diffX < 0 && dx !== -1) { dx = 1; dy = 0; }
+            } else {
+                if (diffY > 0 && dy !== 1) { dx = 0; dy = -1; }
+                else if (diffY < 0 && dy !== -1) { dx = 0; dy = 1; }
+            }
+        });
+
+        function changeSpeed(delta) {
+            speed = Math.max(80, Math.min(300, speed + delta * 30));
+            document.getElementById('speedDisplay').textContent = `Speed: ${Math.max(1, Math.round((300 - speed) / 30))}`;
+        }
+
+        // Game controls
+        document.getElementById('startBtn').onclick = () => {
+            gameRunning = true;
+            dx = 1; dy = 0;
+            snake = [{x: 11, y: 11}];
+            score = 0;
+            randomFood();
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('pauseBtn').classList.remove('hidden');
+            document.getElementById('scoreDisplay').textContent = 'Score: 0';
+            gameLoop = setInterval(update, speed);
+        };
+
+        document.getElementById('pauseBtn').onclick = () => {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('pauseBtn').classList.add('hidden');
+        };
+
+        function gameOver() {
+            gameRunning = false;
+            clearInterval(gameLoop);
+            document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+            document.getElementById('gameOverModal').classList.remove('hidden');
+        }
+
+        document.getElementById('restartBtn').onclick = () => {
+            document.getElementById('gameOverModal').classList.add('hidden');
+            document.getElementById('startBtn').onclick();
+        };
+
+        draw();
+    </script>
+
+</body>
+</html>

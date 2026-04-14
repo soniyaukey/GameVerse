@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+<div id="details" class="p-10"></div>
+
+<script src="../js/api.js"></script>
+
+<script>
+async function loadDetails(){
+    const id = new URLSearchParams(window.location.search).get("id");
+    const game = await getGameById(id);
+
+    document.getElementById("details").innerHTML = `
+        <h1 class="text-3xl">${game.title}</h1>
+        <p>${game.description}</p>
+        <button onclick="window.location.href='play.html?id=${game.id}'">
+            ▶ Play
+        </button>
+    `;
+}
+loadDetails();
+</script>
+
+</body>
+</html>

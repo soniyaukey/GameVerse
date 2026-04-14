@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Number Guessing - GameVerse Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0f0f23 50%, #1a1a2e 100%);
+            min-height: 100vh;
+        }
+        .glow { box-shadow: 0 0 25px rgba(79,70,229,0.5); }
+        .success-glow { box-shadow: 0 0 50px rgba(16,185,129,0.8); }
+        .number-glow { text-shadow: 0 0 30px rgba(16,185,129,0.8); }
+        @keyframes pulse-glow { 
+            0%, 100% { box-shadow: 0 0 25px rgba(16,185,129,0.6); } 
+            50% { box-shadow: 0 0 45px rgba(16,185,129,1); } 
+        }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+        .shake { 
+            animation: shake 0.5s ease-in-out; 
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+        .main-game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .game-controls {
+            background: rgba(30, 58, 138, 0.9);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px;
+            padding: 2.5rem;
+            text-align: center;
+        }
+        .input-row {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .number-input {
+            width: 200px;
+            height: 120px;
+            font-size: 4rem;
+            font-weight: 900;
+            text-align: center;
+            border: 4px solid #6366f1;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(30,58,138,0.9));
+            color: #10b981;
+            text-shadow: 0 0 20px rgba(16,185,129,0.6);
+            transition: all 0.3s ease;
+        }
+        .number-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 30px rgba(16,185,129,0.6);
+        }
+        .guess-button {
+            height: 120px;
+            padding: 0 3rem;
+            font-size: 2.5rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(145deg, #10b981, #059669);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(16,185,129,0.4);
+            min-width: 220px;
+        }
+        .guess-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(16,185,129,0.6);
+        }
+        .feedback-area {
+            min-height: 200px;
+            margin: 2rem 0;
+            padding: 3rem;
+            background: rgba(15,23,42,0.95);
+            border-radius: 24px;
+            border: 3px solid transparent;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .feedback-correct { border-color: #10b981; color: #10b981; }
+        .feedback-wrong-high { border-color: #ef4444; color: #ef4444; }
+        .feedback-wrong-low { border-color: #f59e0b; color: #f59e0b; }
+        .hint-area {
+            background: rgba(251,191,36,0.1);
+            border: 2px solid rgba(251,191,36,0.4);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .stat-card {
+            background: rgba(30,58,138,0.8);
+            border: 2px solid rgba(99,102,241,0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    
+    <div class="main-game-container">
+        
+        <!-- Title & Navigation - SCORE REMOVED -->
+        <div class="flex justify-between items-center mb-8">
+            <a href="../../pages/games.html" class="text-2xl font-bold text-yellow-400 hover:text-yellow-300 transition-all p-3 rounded-xl bg-slate-800/50 backdrop-blur">← Games</a>
+            <h1 class="text-4xl font-black bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent drop-shadow-2xl">
+                🎯 Guess the Number!
+            </h1>
+        </div>
+
+        <!-- Main Game Controls -->
+        <div class="game-controls">
+            <div class="text-6xl font-black text-emerald-400 number-glow mb-8">0 - 50</div>
+            <p class="text-xl mb-12 opacity-90 font-mono">Fewer guesses = More points!</p>
+            
+            <!-- Input Row - Snake style aligned -->
+            <div class="input-row">
+                <input type="text" id="guessInput" class="number-input" placeholder="42" maxlength="2" autocomplete="off">
+                <button onclick="makeGuess()" class="guess-button">🎯 GUESS</button>
+            </div>
+
+            <!-- Feedback Area - Always below input -->
+            <div id="feedbackBox" class="feedback-area">
+                Enter number and press GUESS!
+            </div>
+
+            <!-- Hint Display -->
+            <div id="hintBox" class="hint-area hidden">
+                💡 <span id="hintText"></span>
+            </div>
+        </div>
+
+        <!-- Stats Grid - Snake style -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="text-4xl mb-4 opacity-80">🔥</div>
+                <div class="stat-number" id="attemptCount">0</div>
+                <div class="text-lg opacity-90 mt-2 font-mono">Attempts</div>
+            </div>
+            <div class="stat-card">
+                <div class="text-4xl mb-4 opacity-80">⭐</div>
+                <div class="stat-number" id="highScoreDisplay">0</div>
+                <div class="text-lg opacity-90 mt-2 font-mono">Best Score</div>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="flex gap-6 justify-center mt-12 flex-wrap">
+            <button onclick="getHint()" class="px-12 py-6 bg-gradient-to-r from-amber-500 to-yellow-500 text-xl font-bold rounded-3xl shadow-lg hover:shadow-amber-500/50 hover:scale-105 transition-all px-8 py-4">
+                💡 Hint (3/3)
+            </button>
+            <button onclick="resetGame()" class="px-12 py-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-xl font-bold rounded-3xl shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all px-8 py-4">
+                🔄 New Game
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        let secretNumber = Math.floor(Math.random() * 51); // 0-50
+        let currentScore = 0;
+        let guesses = 0;
+        let hints = 3;
+        let bestScore = localStorage.getItem('bestGuessScore') ? parseInt(localStorage.getItem('bestGuessScore')) : 0;
+        let previousGuesses = [];
+
+        // Initialize
+        function initGame() {
+            secretNumber = Math.floor(Math.random() * 51);
+            currentScore = 0;
+            guesses = 0;
+            hints = 3;
+            previousGuesses = [];
+            updateUI(); // ← FIXED: Live update on every change
+            document.getElementById('feedbackBox').classList.remove('feedback-correct', 'feedback-wrong-high', 'feedback-wrong-low');
+            document.getElementById('feedbackBox').innerHTML = '<div>Enter number (0-50) and press GUESS!</div>';
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+            document.getElementById('hintBox').classList.add('hidden');
+        }
+
+        // Main guess logic
+        function makeGuess() {
+            const guess = parseInt(document.getElementById('guessInput').value);
+            
+            if (isNaN(guess) || guess < 0 || guess > 50) {
+                document.getElementById('feedbackBox').innerHTML = 'Invalid! 0-50 only.';
+                document.getElementById('feedbackBox').classList.add('shake');
+                setTimeout(() => document.getElementById('feedbackBox').classList.remove('shake'), 500);
+                updateUI(); // Live update
+                return;
+            }
+
+            guesses++;
+            
+            if (previousGuesses.includes(guess)) {
+                document.getElementById('feedbackBox').innerHTML = `Already tried ${guess}!`;
+                document.getElementById('feedbackBox').classList.add('shake');
+                setTimeout(() => document.getElementById('feedbackBox').classList.remove('shake'), 500);
+                updateUI();
+                return;
+            }
+
+            previousGuesses.push(guess);
+
+            if (guess === secretNumber) {
+                const bonus = Math.max(100 - (guesses * 8), 25);
+                currentScore += bonus;
+                
+                document.getElementById('feedbackBox').innerHTML = `🎉 CORRECT! ${secretNumber} | +${bonus}pts (${guesses} guesses)`;
+                document.getElementById('feedbackBox').classList.add('feedback-correct', 'success-glow');
+                
+                if (currentScore > bestScore) {
+                    bestScore = currentScore;
+                    localStorage.setItem('bestGuessScore', bestScore);
+                }
+                
+                updateUI();
+                
+                setTimeout(() => {
+                    if (confirm(`🎊 WINNER! +${bonus}pts\nTotal: ${currentScore}\nNew game?`)) {
+                        initGame();
+                    }
+                }, 2000);
+                
+            } else if (guess < secretNumber) {
+                document.getElementById('feedbackBox').innerHTML = `📈 ${guess} is TOO LOW ↑`;
+                document.getElementById('feedbackBox').classList.add('feedback-wrong-low', 'shake');
+                setTimeout(() => document.getElementById('feedbackBox').classList.remove('shake'), 500);
+                updateUI();
+            } else {
+                document.getElementById('feedbackBox').innerHTML = `📉 ${guess} is TOO HIGH ↓`;
+                document.getElementById('feedbackBox').classList.add('feedback-wrong-high', 'shake');
+                setTimeout(() => document.getElementById('feedbackBox').classList.remove('shake'), 500);
+                updateUI();
+            }
+
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+        }
+
+        // Get hint
+        function getHint() {
+            if (hints <= 0) {
+                document.getElementById('feedbackBox').innerHTML = 'No hints left! Keep guessing!';
+                updateUI();
+                return;
+            }
+
+            hints--;
+            const hintRange = 6;
+            const hintLow = Math.max(0, secretNumber - hintRange);
+            const hintHigh = Math.min(50, secretNumber + hintRange);
+            
+            document.getElementById('hintBox').classList.remove('hidden');
+            document.getElementById('hintText').textContent = `Hint ${4-hints}/3: ${hintLow}-${hintHigh}`;
+            updateUI();
+        }
+
+        // Reset
+        function resetGame() {
+            initGame();
+        }
+
+        // Update UI - COMPREHENSIVE
+        function updateUI() {
+            // Live score/attempts update
+            const scoreEl = document.getElementById('liveScore');
+            const attemptsEl = document.getElementById('attemptCount');
+            const highScoreEl = document.getElementById('highScoreDisplay');
+            
+            if (scoreEl) scoreEl.textContent = currentScore;
+            if (attemptsEl) attemptsEl.textContent = guesses;
+            if (highScoreEl) highScoreEl.textContent = bestScore;
+        }
+
+        // Events
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                makeGuess();
+            }
+        });
+
+        document.getElementById('guessInput').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0,2);
+        });
+
+        // Auto-focus on load
+        window.onload = function() {
+            initGame();
+        };
+    </script>
+</body>
+</html>
